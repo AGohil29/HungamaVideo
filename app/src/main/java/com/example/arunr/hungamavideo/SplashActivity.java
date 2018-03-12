@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,21 +22,32 @@ import android.widget.TextView;
  */
 
 public class SplashActivity extends AppCompatActivity {
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
-    Boolean isClicked;
+
+    private boolean clicked = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // here initializing the sharedPreference
-        sharedPreferences = getSharedPreferences("Terms And Conditions", MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        // initializing shared preference
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        boolean isClicked = prefs.getBoolean("isClicked", false);
 
-        // Check here if button is clicked or not
-        isClicked = sharedPreferences.getBoolean("Agreed", false);
+        if (!isClicked) {
+            showStartDialog();
+        } else {
+            final Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                    finish();
+                }
+            }, 1500);
+        }
+    }
 
+    private void showStartDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
 
         View view = getLayoutInflater().inflate(R.layout.terms_and_conditions, null);
@@ -66,19 +78,13 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        // for how much time splashScreen should be displayed to the user
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // if button is clicked then redirect to the homescreen/MainActivity
-
-
-            }
-        }, 3000);
-
         AlertDialog dialog = builder.create();
         dialog.show();
 
-    }
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isClicked", true);
+        editor.apply();
 
+    }
 }
