@@ -23,8 +23,6 @@ import android.widget.TextView;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private boolean clicked = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,16 +73,17 @@ public class SplashActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
+
+                // setting the buttons isClicked value to true
+                SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("isClicked", true);
+                editor.apply();
             }
         });
 
         AlertDialog dialog = builder.create();
         dialog.show();
-
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("isClicked", true);
-        editor.apply();
 
     }
 }
