@@ -4,12 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -22,6 +18,8 @@ import android.widget.TextView;
  */
 
 public class SplashActivity extends AppCompatActivity {
+    private AlertDialog dialog;
+    private boolean isClicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +27,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // initializing shared preference
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-        boolean isClicked = prefs.getBoolean("isClicked", false);
+        isClicked = prefs.getBoolean("isClicked", false);
 
         if (!isClicked) {
             showStartDialog();
@@ -72,6 +70,11 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                // when back button is pressed from MainActivity it exits the app
+                // else it goes to dialog screen and then the splashscreen,
+                // when the dialog is displayed to the user for first time
+                // or if the user has not agreed to the terms and conditions
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
 
                 // setting the buttons isClicked value to true
@@ -82,8 +85,16 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        AlertDialog dialog = builder.create();
+        dialog = builder.create();
         dialog.show();
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (dialog != null) {
+            dialog.dismiss();
+            dialog = null;
+        }
     }
 }
