@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 public class SplashActivity extends AppCompatActivity {
     private AlertDialog dialog;
-    private boolean isClicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // initializing shared preference
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-        isClicked = prefs.getBoolean("isClicked", false);
+        boolean isClicked = prefs.getBoolean("isClicked", false);
 
         if (!isClicked) {
             showStartDialog();
