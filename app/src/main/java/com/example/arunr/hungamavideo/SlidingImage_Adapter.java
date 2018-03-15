@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.example.arunr.hungamavideo.Model.Movie;
+
 import java.util.ArrayList;
 
 /**
@@ -16,11 +19,11 @@ import java.util.ArrayList;
 
 public class SlidingImage_Adapter extends PagerAdapter {
 
-    private ArrayList<Integer> IMAGES;
+    private ArrayList<Movie> IMAGES;
     private LayoutInflater inflater;
     private Context context;
 
-    public SlidingImage_Adapter(Context context, ArrayList<Integer> IMAGES) {
+    public SlidingImage_Adapter(Context context, ArrayList<Movie> IMAGES) {
         this.context = context;
         this.IMAGES = IMAGES;
         inflater = LayoutInflater.from(context);
@@ -43,8 +46,11 @@ public class SlidingImage_Adapter extends PagerAdapter {
         assert imageLayout != null;
         final ImageView imageView = (ImageView) imageLayout
                 .findViewById(R.id.image);
-        imageView.setImageResource(IMAGES.get(position));
-        view.addView(imageLayout, 0);
+        Glide.with(context)
+             .load(IMAGES.get(position).getImages().get(0).getImage())
+             .placeholder(R.drawable.one)
+             .into(imageView);
+        view.addView(imageLayout);
         return imageLayout;
     }
 

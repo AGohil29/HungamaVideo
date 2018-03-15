@@ -38,34 +38,49 @@ import ss.com.bannerslider.views.BannerSlider;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final static String Url = "https://n-pvt.hungama.com/v2/content/movieapp/queue_data.json?device=1080x1920&section_id=1&genre=Gossip&bucket_id=5360&offset=0&user_type=1&version=2.0.10.7&app-id=e3MH8F20cr&limit=30&cp=33682232";
-    private static ViewPager pager;
+    private final static String Url = "https://n-pvt.hungama.com/v2/content/movieapp/queue_data.json?device=1080x1920&section_id=1&genre=Gossip&bucket_id=5360&offset=0&user_type=1&version=2.0.10.7&app-id=e3MH8F20cr&limit=10&cp=33682232";
+    private ViewPager pager;
+    private CirclePageIndicator indicator;
     private static int currentPage = 0;
     private static int NUM_PAGES = 0;
-    private static final Integer[] IMAGES = {R.drawable.one,R.drawable.two,R.drawable.three,R.drawable.four,R.drawable.five};
-    private ArrayList<Integer> ImagesArray = new ArrayList<Integer>();
+    private ArrayList<Movie> imagesArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        pager = findViewById(R.id.pager);
+        indicator = (CirclePageIndicator) findViewById(R.id.indicator);
+
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+
+        retrofit2.Call<MovieResponse> call = apiService.getMovieDetails(Url);
+        call.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                imagesArray = response.body().getNode().getData();
+                pager.setAdapter(new SlidingImage_Adapter(MainActivity.this, imagesArray));
+                indicator.setViewPager(pager);
+            }
+
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
+
+            }
+        });
+
         init();
+
     }
 
     private void init() {
-        ImagesArray.addAll(Arrays.asList(IMAGES));
-
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new SlidingImage_Adapter(MainActivity.this, ImagesArray));
-
-        CirclePageIndicator indicator = (CirclePageIndicator) findViewById(R.id.indicator);
-        indicator.setViewPager(pager);
 
         final float density = getResources().getDisplayMetrics().density;
 
         // Set circle indicator radius
         indicator.setRadius(5 * density);
-        NUM_PAGES = IMAGES.length;
+        NUM_PAGES = imagesArray.size();
 
         // Auto start of view pager
         final Handler handler = new Handler();
